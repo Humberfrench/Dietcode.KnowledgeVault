@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Dietcode.KnowledgeVault.Application/Dietcode.KnowledgeVault.Application.csproj" />
+    <Project Path="src/Dietcode.KnowledgeVault.Domain/Dietcode.KnowledgeVault.Domain.csproj" />
+    <Project Path="src/Dietcode.KnowledgeVault.Infrastructure/Dietcode.KnowledgeVault.Infrastructure.csproj" />
+    <Project Path="src/Dietcode.KnowledgeVault.Server/Dietcode.KnowledgeVault.Server.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Dietcode.KnowledgeVault.IntegrationTests/Dietcode.KnowledgeVault.IntegrationTests.csproj" />
+    <Project Path="tests/Dietcode.KnowledgeVault.UnitTests/Dietcode.KnowledgeVault.UnitTests.csproj" />
+  </Folder>
+</Solution>
