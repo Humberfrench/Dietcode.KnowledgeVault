@@ -9,7 +9,7 @@ namespace Dietcode.KnowledgeVault.Infrastructure.FileSystem;
 /// <summary>Checks the actual opened object before content is read. The supported host is Windows/IIS.</summary>
 internal static class WindowsOpenedFileGuard
 {
-    public static void Validate(SafeFileHandle handle, string expectedPath)
+    public static void Validate(SafeFileHandle handle, string expectedPath, bool directory = false)
     {
         if (!OperatingSystem.IsWindows())
             throw new PlatformNotSupportedException("Secure Vault file reads currently require Windows.");
@@ -37,9 +37,10 @@ internal static class WindowsOpenedFileGuard
 
         if (!GetFileInformationByHandle(handle, out var info))
             throw new IOException("Cannot verify the opened file attributes.", new Win32Exception(Marshal.GetLastWin32Error()));
-        if ((info.Attributes & (uint)(FileAttributes.ReparsePoint | FileAttributes.Directory)) != 0 ||
-            info.NumberOfLinks != 1)
-            throw new VaultPathException("Only regular files with a single filesystem link are allowed.");
+        if ((info.Attributes & (uint)FileAttributes.ReparsePoint) != 0 ||
+            ((info.Attributes & (uint)FileAttributes.Directory) != 0) != directory ||
+            (!directory && info.NumberOfLinks != 1))
+            throw new VaultPathException("The opened object has an unexpected type, reparse point or multiple file links.");
     }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]

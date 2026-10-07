@@ -14,7 +14,7 @@ namespace Dietcode.KnowledgeVault.IntegrationTests.FileSystem;
 public sealed class NoteReadTests
 {
     private static IVaultService Service(TemporaryVault vault, long limit = 2097152) =>
-        new VaultService(new FileSystemNoteReader(new VaultPathResolver(vault.Root), limit));
+        CreateService(new VaultPathResolver(vault.Root), limit);
 
     [Theory]
     [InlineData("# Nota\r\n\r\nLiquidação, ação, café, 中文, 😀\r\n")]
@@ -178,7 +178,7 @@ public sealed class NoteReadTests
         await File.WriteAllTextAsync(Path.Combine(vault.Outside, "note.md"), "outside");
         var resolver = new AfterResolve(new VaultPathResolver(vault.Root),
             () => vault.CreateDirectoryLink(Path.Combine(vault.Root, "link"), vault.Outside));
-        var service = new VaultService(new FileSystemNoteReader(resolver, 1024));
+        var service = CreateService(resolver, 1024);
         await Assert.ThrowsAsync<VaultPathException>(() => service.ReadAsync("link/note.md"));
     }
 
@@ -214,6 +214,12 @@ public sealed class NoteReadTests
         using var provider = new ServiceCollection().AddVault(configuration).BuildServiceProvider();
         var service = provider.GetRequiredService<IVaultService>();
         await Assert.ThrowsAsync<NoteSizeExceededException>(() => service.ReadAsync("note.md"));
+    }
+
+    private static IVaultService CreateService(IVaultPathResolver resolver, long limit)
+    {
+        var reader = new FileSystemNoteReader(resolver, limit);
+        return new VaultService(reader, new FileSystemNoteLister(resolver, reader));
     }
 
     private sealed class AfterResolve(IVaultPathResolver inner, Action action) : IVaultPathResolver

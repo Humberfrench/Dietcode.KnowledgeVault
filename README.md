@@ -1,10 +1,10 @@
 # Dietcode.KnowledgeVault
 
-Versão atual: **1.0.4**. Seguir [as regras de versionamento](docs/Versionamento.md)
+Versão atual: **1.0.5**. Seguir [as regras de versionamento](docs/Versionamento.md)
 em cada entrega e antes de publicar manualmente.
 
-Servidor .NET 10 para acesso controlado a um Vault Markdown. As fases **0, 1, 2 e 3**
-estão implementadas. Leitura e informações de arquivo estão disponíveis via IVaultService; escrita e MCP pertencem às fases seguintes.
+Servidor .NET 10 para acesso controlado a um Vault Markdown. As fases **0, 1, 2, 3 e 4**
+estão implementadas. Leitura, informações de arquivo e listagem estão disponíveis via IVaultService; escrita e MCP pertencem às fases seguintes.
 
 ## Arquitetura
 
@@ -113,3 +113,13 @@ dotnet test Dietcode.KnowledgeVault.slnx --no-build
 ~~~
 
 Evidências: [fases 0 a 2](docs/Fases-00-02.md) e [fase 3](docs/Fase-03.md).
+
+## Listagem (fase 4)
+
+IVaultService.ListAsync() lista as notas na raiz; ListAsync("Trabalho/TAG")
+lista somente as notas diretamente nessa pasta. Não é recursivo.
+Retorna NoteInfo, ignora subpastas e extensões diferentes de .md, com ordenação
+estável por caminho relativo. Pasta vazia retorna coleção vazia; pasta inexistente
+gera erro conhecido. Mantém os controles de tamanho e segurança do GetInfoAsync.
+
+Decisões e evidências: [Fase 4](docs/Fase-04.md).

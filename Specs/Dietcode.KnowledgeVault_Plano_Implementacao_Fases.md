@@ -42,7 +42,7 @@ IntegrationTests referencia Infrastructure e Server. A solution usa o formato .s
 A raiz do Vault deve ser configurada explicitamente e existir; não é criada no
 startup. A V1 admite apenas .md após normalização. A segurança rejeita reparse
 points, incluindo junctions, e caminhos percent-encoded; veja os limites de I/O
-e as evidências no registro de aceite. A fase 3 foi implementada na versão 1.0.4, conforme docs/Fase-03.md. As fases 4 a 20 continuam pendentes.
+e as evidências no registro de aceite. A fase 3 foi implementada na versão 1.0.4, conforme docs/Fase-03.md. A fase 4 foi implementada na versão 1.0.5, conforme docs/Fase-04.md. As fases 5 a 20 continuam pendentes.
 
 # 2. Nome e Solution
 
@@ -436,6 +436,8 @@ e confirmar leitura correta.
 ------------------------------------------------------------------------
 
 # 9. FASE 4 --- Listagem
+
+Implementada na versão 1.0.5. Listagem somente no nível atual. [Evidências e decisões](../docs/Fase-04.md).
 
 ## Objetivo
 

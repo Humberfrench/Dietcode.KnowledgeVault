@@ -5,7 +5,7 @@ using Dietcode.KnowledgeVault.Domain.ValueObjects;
 
 namespace Dietcode.KnowledgeVault.Application.Services;
 
-public sealed class VaultService(INoteReader reader) : IVaultService
+public sealed class VaultService(INoteReader reader, INoteLister lister) : IVaultService
 {
     public Task<NoteContent> ReadAsync(string path, CancellationToken cancellationToken = default)
     {
@@ -17,6 +17,21 @@ public sealed class VaultService(INoteReader reader) : IVaultService
     {
         cancellationToken.ThrowIfCancellationRequested();
         return reader.GetInfoAsync(Validate(path), cancellationToken);
+    }
+
+    public Task<IReadOnlyCollection<NoteInfo>> ListAsync(string? folder = null, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        VaultPath? path = null;
+        if (folder is not null)
+        {
+            try { path = new VaultPath(folder); }
+            catch (ArgumentException exception)
+            {
+                throw new VaultPathException("Supply a valid relative folder, or null for the root.", exception);
+            }
+        }
+        return lister.ListAsync(path, cancellationToken);
     }
 
     private static NotePath Validate(string path)
