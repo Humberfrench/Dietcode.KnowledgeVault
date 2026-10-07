@@ -1,10 +1,10 @@
 # Dietcode.KnowledgeVault
 
-Versão atual: **1.0.5**. Seguir [as regras de versionamento](docs/Versionamento.md)
+Versão atual: **1.0.6**. Seguir [as regras de versionamento](docs/Versionamento.md)
 em cada entrega e antes de publicar manualmente.
 
 Servidor .NET 10 para acesso controlado a um Vault Markdown. As fases **0, 1, 2, 3 e 4**
-estão implementadas. Leitura, informações de arquivo e listagem estão disponíveis via IVaultService; escrita e MCP pertencem às fases seguintes.
+estão implementadas. Leitura, informações de arquivo e listagem estão disponíveis via IVaultService; A fase 5 acrescenta CreateAsync, com aceite visual no Obsidian pendente. Append, update e MCP pertencem às fases seguintes.
 
 ## Arquitetura
 
@@ -123,3 +123,12 @@ estável por caminho relativo. Pasta vazia retorna coleção vazia; pasta inexis
 gera erro conhecido. Mantém os controles de tamanho e segurança do GetInfoAsync.
 
 Decisões e evidências: [Fase 4](docs/Fase-04.md).
+## Criação (fase 5)
+
+IVaultService.CreateAsync("Trabalho/Nota.md", "# Nota") cria um Markdown UTF-8
+sem BOM e retorna NoteInfo. A pasta pai deve existir. Conteúdo acima do limite,
+caminho inseguro ou destino existente são rejeitados; arquivos existentes não
+são sobrescritos. A criação usa temporário e publicação por rename na mesma pasta.
+
+A nota Vault/Teste-Fase-05.md foi criada pelo serviço e está disponível para
+conferência visual no Obsidian (pendente). [Decisões e evidências](docs/Fase-05.md).

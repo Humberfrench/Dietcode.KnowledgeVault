@@ -219,7 +219,9 @@ public sealed class NoteReadTests
     private static IVaultService CreateService(IVaultPathResolver resolver, long limit)
     {
         var reader = new FileSystemNoteReader(resolver, limit);
-        return new VaultService(reader, new FileSystemNoteLister(resolver, reader));
+        var policy = new Dietcode.KnowledgeVault.Domain.Policies.NoteSizePolicy(limit);
+        return new VaultService(reader, new FileSystemNoteLister(resolver, reader),
+            new FileSystemNoteCreator(resolver, policy), policy);
     }
 
     private sealed class AfterResolve(IVaultPathResolver inner, Action action) : IVaultPathResolver

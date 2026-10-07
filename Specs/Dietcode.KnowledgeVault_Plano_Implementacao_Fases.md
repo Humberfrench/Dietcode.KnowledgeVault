@@ -42,7 +42,7 @@ IntegrationTests referencia Infrastructure e Server. A solution usa o formato .s
 A raiz do Vault deve ser configurada explicitamente e existir; não é criada no
 startup. A V1 admite apenas .md após normalização. A segurança rejeita reparse
 points, incluindo junctions, e caminhos percent-encoded; veja os limites de I/O
-e as evidências no registro de aceite. A fase 3 foi implementada na versão 1.0.4, conforme docs/Fase-03.md. A fase 4 foi implementada na versão 1.0.5, conforme docs/Fase-04.md. As fases 5 a 20 continuam pendentes.
+e as evidências no registro de aceite. A fase 3 foi implementada na versão 1.0.4, conforme docs/Fase-03.md. A fase 4 foi implementada na versão 1.0.5, conforme docs/Fase-04.md. A fase 5 foi implementada na versão 1.0.6, com aceite visual no Obsidian pendente (docs/Fase-05.md). As fases 6 a 20 continuam pendentes.
 
 # 2. Nome e Solution
 
@@ -489,6 +489,8 @@ SearchAsync = recursivo
 ------------------------------------------------------------------------
 
 # 10. FASE 5 --- Criação de notas
+
+Implementada na versão 1.0.6; testes e validação no Vault local concluídos. Aceite visual no Obsidian pendente. [Evidências](../docs/Fase-05.md).
 
 ## Objetivo
 
