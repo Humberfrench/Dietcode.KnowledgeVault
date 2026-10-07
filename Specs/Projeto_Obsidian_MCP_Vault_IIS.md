@@ -1231,8 +1231,11 @@ privados posteriormente.
 
 # 35. Estrutura da Solution .NET
 
+Decisão vigente: seis projetos, com Domain e Application separados. As fases 0 a 2
+foram implementadas na versão 1.0.2; consultar docs/Fases-00-02.md e o plano por fases.
+
 ``` text
-Dietcode.KnowledgeVault.sln
+Dietcode.KnowledgeVault.slnx
 │
 ├── src/
 │   ├── Dietcode.KnowledgeVault.Server/
@@ -1243,7 +1246,9 @@ Dietcode.KnowledgeVault.sln
 │   │   ├── Security/
 │   │   └── Configuration/
 │   │
-│   ├── Dietcode.KnowledgeVault.Core/
+│   ├── Dietcode.KnowledgeVault.Domain/
+│   │
+│   ├── Dietcode.KnowledgeVault.Application/
 │   │   ├── Interfaces/
 │   │   ├── Models/
 │   │   └── Services/
@@ -1289,7 +1294,7 @@ public interface IVaultService
   "Vault": {
     "RootPath": "/srv/knowledge/vault",
     "AllowedExtensions": [".md"],
-    "MaxFileSizeMb": 2
+    "MaxFileSizeBytes": 2097152
   }
 }
 ```
