@@ -19,6 +19,10 @@ public static class VaultServiceRegistration
             provider.GetRequiredService<IOptions<VaultOptions>>().Value.RootPath));
         services.AddSingleton(provider => new NoteSizePolicy(
             provider.GetRequiredService<IOptions<VaultOptions>>().Value.MaxFileSizeBytes));
+        services.AddSingleton<INoteReader>(provider => new FileSystemNoteReader(
+            provider.GetRequiredService<IVaultPathResolver>(),
+            provider.GetRequiredService<IOptions<VaultOptions>>().Value.MaxFileSizeBytes));
+        services.AddSingleton<IVaultService, Dietcode.KnowledgeVault.Application.Services.VaultService>();
         return services;
     }
 }

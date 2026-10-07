@@ -3,3 +3,6 @@
 .vs/
 *.user
 TestResults/
+
+# Local knowledge content is separate from application source.
+/Vault/

@@ -1,19 +1,19 @@
 # Dietcode.KnowledgeVault
 
-Versão atual: **1.0.2**. Seguir [as regras de versionamento](docs/Versionamento.md)
+Versão atual: **1.0.4**. Seguir [as regras de versionamento](docs/Versionamento.md)
 em cada entrega e antes de publicar manualmente.
 
-Servidor .NET 10 para acesso controlado a um Vault Markdown. As fases **0, 1 e 2**
-estão implementadas. Leitura/escrita de notas e MCP pertencem às fases seguintes.
+Servidor .NET 10 para acesso controlado a um Vault Markdown. As fases **0, 1, 2 e 3**
+estão implementadas. Leitura e informações de arquivo estão disponíveis via IVaultService; escrita e MCP pertencem às fases seguintes.
 
 ## Arquitetura
 
 - **Domain**: notas, metadados, caminhos lógicos, versões e política de tamanho, sem dependências externas.
-- **Application**: contrato IVaultPathResolver, configuração VaultOptions e erros conhecidos da aplicação.
-- **Infrastructure**: VaultPathResolver e inspeção física de caminhos/reparse points.
+- **Application**: IVaultService, VaultService, portas INoteReader/IVaultPathResolver, modelos de leitura e configuração VaultOptions.
+- **Infrastructure**: VaultPathResolver, FileSystemNoteReader e verificação do handle aberto no Windows.
 - **Server**: composição via DI, binding, normalização e validação de configuração no startup.
 - **UnitTests**: regras do domínio e normalização de extensões.
-- **IntegrationTests**: filesystem temporário, junctions reais e startup ASP.NET Core.
+- **IntegrationTests**: leitura UTF-8, metadados, limites, filesystem temporário, junctions/hard links e startup ASP.NET Core.
 
 Todos os projetos usam o prefixo Dietcode.KnowledgeVault.
 Referências: Application → Domain; Infrastructure → Application;
@@ -29,29 +29,28 @@ responsabilidades separadas.
 ## Configuração e execução local
 
 O diretório do Vault **deve existir**. A aplicação não o cria automaticamente.
-Vault:RootPath fica vazio no arquivo versionado para exigir configuração explícita
-em cada ambiente. Não há dependência de um caminho específico da máquina.
 
-Exemplo PowerShell (escolha uma pasta local dedicada):
+Os caminhos estão definidos no projeto Server:
+
+| Ambiente | Arquivo | RootPath |
+|---|---|---|
+| Produção (configuração base) | appsettings.json | C:\Knowledge\Vault |
+| Development | appsettings.Development.json | E:\Dev.Dietcode\Dietcode.KnowledgeVault\Vault |
+
+A pasta local Vault foi criada e está ignorada no Git para manter as notas fora
+do repositório do código. Em outro checkout, crie a pasta antes de executar.
+No servidor de produção, crie C:\Knowledge\Vault e conceda as permissões necessárias
+à identidade da aplicação antes de iniciá-la.
+
+Os perfis de execução do projeto já selecionam Development. Para executar localmente:
 
 ~~~powershell
-New-Item -ItemType Directory -Path 'D:\Knowledge\Vault' -Force
-$env:Vault__RootPath = 'D:\Knowledge\Vault'
-dotnet run --project src/Dietcode.KnowledgeVault.Server --no-launch-profile --urls http://127.0.0.1:5055
+dotnet run --project src/Dietcode.KnowledgeVault.Server --launch-profile http
 ~~~
 
-Alternativamente, forneça --Vault:RootPath=D:\Knowledge\Vault ao executar a aplicação.
-Configuração disponível em appsettings.json:
-
-~~~json
-{
-  "Vault": {
-    "RootPath": "",
-    "AllowedExtensions": [".md"],
-    "MaxFileSizeBytes": 2097152
-  }
-}
-~~~
+A configuração base mantém AllowedExtensions = [".md"] e MaxFileSizeBytes = 2097152.
+Development sobrescreve somente RootPath. Variáveis de ambiente, como Vault__RootPath,
+e argumentos de linha de comando continuam podendo sobrescrever esses valores.
 
 - RootPath: absoluto, existente, diretório e sem reparse points no caminho.
 - Extensões: normalizadas (espaços, caixa, ponto inicial, duplicação); apenas .md na V1.
@@ -81,11 +80,22 @@ são permitidos para os futuros casos de criação. Resolução de caminho não 
 extensão de nota: pastas também precisam ser resolvidas; leitura/escrita validarão
 as extensões nas próximas fases.
 
-**Limite da garantia:** a inspeção vale no instante da resolução. Um processo
-externo com permissão de alterar o filesystem pode trocar componentes depois dela.
-Nas fases de I/O, a resolução deverá ser associada à abertura segura e às permissões
-NTFS; não reutilizar caminhos resolvidos como autorização permanente. O resolvedor
-não implementa isolamento do processo, bloqueio de hard links ou permissões NTFS.
+## Leitura e informações de notas
+
+IVaultService.ReadAsync retorna NoteContent (Info e Content). GetInfoAsync retorna
+NoteInfo com nome, caminho relativo, extensão, bytes físicos e datas UTC.
+Ambos respeitam MaxFileSizeBytes, aceitam CancellationToken e retornam erros conhecidos
+para notas ausentes, extensão proibida, falta de acesso e falhas de I/O.
+A leitura usa UTF-8 estrito, com ou sem BOM; não altera o arquivo nem interpreta YAML.
+
+A fase 3 usa um adaptador de leitura **Windows**, adequado ao IIS previsto.
+Após resolver o caminho, o leitor abre o arquivo somente para leitura e verifica
+o caminho final do handle antes de ler conteúdo. Também bloqueia múltiplos hard links.
+O caminho é revalidado após a abertura. Fora do Windows, o leitor falha explicitamente.
+
+A validação do resolvedor isolado continua valendo apenas no instante da chamada.
+As verificações do leitor não substituem permissões NTFS e isolamento de produção.
+Evidências, erros, decisões e limites estão em [Fase 3](docs/Fase-03.md).
 
 ## Regras de domínio preservadas
 
@@ -102,4 +112,4 @@ dotnet build Dietcode.KnowledgeVault.slnx --no-restore
 dotnet test Dietcode.KnowledgeVault.slnx --no-build
 ~~~
 
-Evidências e limites: [aceite das fases 0 a 2](docs/Fases-00-02.md).
+Evidências: [fases 0 a 2](docs/Fases-00-02.md) e [fase 3](docs/Fase-03.md).
